@@ -1,0 +1,114 @@
+/************************
+** CREATION DES TABLES **
+*************************/
+--PEREIRA--LOUNIS, BOURDELET, BOISSERIE, MARTIN--
+
+--Toutes ont été réalisées par Malaury PEREIRA-LOUNIS--
+CREATE TABLE INDIVIDU(
+   idIndividu NUMBER(5),
+   NomIndividu VARCHAR(50) NOT NULL,
+   PrenomIndividu VARCHAR(50),
+   AgeIndividu NUMBER(2),
+   RoleIndividu VARCHAR(50) NOT NULL,
+   CONSTRAINT cleINDIVIDU PRIMARY KEY(idIndividu),
+   CONSTRAINT verifAgeIndividu CHECK((AgeIndividu>0) OR (AgeIndividu is NULL))
+);
+
+CREATE TABLE PARTIE(
+   idPartie NUMBER(5),
+   DateDiffusion DATE NOT NULL,
+   CONSTRAINT clePARTIE PRIMARY KEY(idPartie)
+);
+
+CREATE TABLE EPISODE(
+   idEpisode NUMBER(5),
+   NumeroEpisode NUMBER(5) NOT NULL,
+   TitreEpisodeVO VARCHAR(50),
+   TitreEpisodeVF VARCHAR(50),
+   Realisateur NUMBER(5),
+   PartieEpisode NUMBER(5) NOT NULL,
+   CONSTRAINT cleEPISODE PRIMARY KEY(idEpisode),
+   CONSTRAINT cleREALISATEUR FOREIGN KEY(Realisateur) REFERENCES INDIVIDU(idIndividu),
+   CONSTRAINT clePARTIEEPISODE FOREIGN KEY(PartieEpisode) REFERENCES PARTIE(idPartie),
+   CONSTRAINT verifNumeroEpisode CHECK(NumeroEpisode>0)
+);
+
+CREATE TABLE PAYS(
+   idPays NUMBER(5),
+   NomPays VARCHAR(50) NOT NULL,
+   CONSTRAINT clePAYS PRIMARY KEY(idPays)
+);
+
+CREATE TABLE PERSONNAGE(
+   idPersonnage NUMBER(5),
+   NomPersonnage VARCHAR(50),
+   PrenomPersonnage VARCHAR(50),
+   SurnomPersonnage VARCHAR(50),
+   PremiereApparition NUMBER(5) NOT NULL,
+   DerniereApparition NUMBER(5) NOT NULL,
+   MortPersonnage NUMBER(5),
+   Acteur NUMBER(5) NOT NULL,
+   CONSTRAINT clePERSONNAGE PRIMARY KEY(idPersonnage),
+   CONSTRAINT clePREMIEREAPPARITION FOREIGN KEY(PremiereApparition) REFERENCES EPISODE(idEpisode),
+   CONSTRAINT cleDERNIEREAPPARTION FOREIGN KEY(DerniereApparition) REFERENCES EPISODE(idEpisode),
+   CONSTRAINT cleMORTPERSONNAGE FOREIGN KEY(MortPersonnage) REFERENCES EPISODE(idEpisode),
+   CONSTRAINT cleACTEUR FOREIGN KEY(Acteur) REFERENCES INDIVIDU(idIndividu)
+);
+
+CREATE TABLE VILLE(
+   idVille NUMBER(5),
+   NomVille VARCHAR(50) NOT NULL,
+   VillePays NUMBER(5) NOT NULL,
+   CONSTRAINT cleVILLE PRIMARY KEY(idVille),
+   CONSTRAINT cleVILLEPAYS FOREIGN KEY(VillePays) REFERENCES PAYS(idPays)
+);
+
+CREATE TABLE LIEU(
+   idLieu NUMBER(5),
+   NomLieu VARCHAR(50) NOT NULL,
+   VilleLieu NUMBER(5) NOT NULL,
+   CONSTRAINT cleLIEU PRIMARY KEY(idLieu),
+   CONSTRAINT cleVILLELIEU FOREIGN KEY(VilleLieu) REFERENCES VILLE(idVille)
+);
+
+CREATE TABLE EVENEMENT(
+   idEvenement NUMBER(5),
+   DescriptionEvenement VARCHAR(150) NOT NULL,
+   EpisodeEvenement NUMBER(5) NOT NULL,
+   LieuEvenement NUMBER(5),
+   CONSTRAINT cleEVENEMENT PRIMARY KEY(idEvenement),
+   CONSTRAINT cleEPISODEEVENEMENT FOREIGN KEY(EpisodeEvenement) REFERENCES EPISODE(idEpisode),
+   CONSTRAINT cleLIEUEVENEMENT FOREIGN KEY(LieuEvenement) REFERENCES LIEU(idLieu)
+);
+
+CREATE TABLE cause_par(
+   PersonnageDeclencheur NUMBER(5),
+   EvenementProduit NUMBER(5),
+   CONSTRAINT cleCAUSE_PAR PRIMARY KEY(PersonnageDeclencheur, EvenementProduit),
+   CONSTRAINT clePERSONNAGEDECLENCHEUR FOREIGN KEY(PersonnageDeclencheur) REFERENCES PERSONNAGE(idPersonnage),
+   CONSTRAINT cleEVENEMENTPRODUIT FOREIGN KEY(EvenementProduit) REFERENCES EVENEMENT(idEvenement)
+);
+
+CREATE TABLE est_en_lien(
+   idLien NUMBER(5),
+   Personnage1 NUMBER(5) NOT NULL,
+   Personnage2 NUMBER(5) NOT NULL,
+   TypeRelation VARCHAR(50) NOT NULL,
+   CONSTRAINT cleEST_EN_LIEN PRIMARY KEY(idLien),
+   CONSTRAINT clePERSONNAGE1 FOREIGN KEY(Personnage1) REFERENCES PERSONNAGE(idPersonnage),
+   CONSTRAINT clePERSONNAGE2 FOREIGN KEY(Personnage2) REFERENCES PERSONNAGE(idPersonnage)
+);
+
+
+/* SUPPRIMER LES TABLES
+DROP TABLE est_en_lien;
+DROP TABLE cause_par;
+DROP TABLE EVENEMENT;
+DROP TABLE LIEU;
+DROP TABLE VILLE;
+DROP TABLE PERSONNAGE;
+DROP TABLE PAYS;
+DROP TABLE EPISODE;
+DROP TABLE PARTIE;
+DROP TABLE INDIVIDU;
+*/
